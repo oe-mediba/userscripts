@@ -5,7 +5,6 @@
 // @description  talknote が横幅固定なので横幅いっぱいに
 // @include    https://company.talknote.com/*/*
 // @copyright  2013+, y-oe@mediba.jp
-// @require http://code.jquery.com/jquery-2.0.3.min.js
 // ==/UserScript==
 
 // common function in css to change css style
@@ -32,7 +31,11 @@ addGlobalStyle('\
 #left_nav ul.left_menu li ul li a.active { background-image: none; background-color: #4682b4; } \
 ');
 
-(function ($) {
+
+var load,execute,loadAndExecute;load=function(a,b,c){var d;d=document.createElement("script"),d.setAttribute("src",a),b!=null&&d.addEventListener("load",b),c!=null&&d.addEventListener("error",c),document.body.appendChild(d);return d},execute=function(a){var b,c;typeof a=="function"?b="("+a+")();":b=a,c=document.createElement("script"),c.textContent=b,document.body.appendChild(c);return c},loadAndExecute=function(a,b){return load(a,function(){return execute(b)})};
+
+loadAndExecute("//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js", function() {
+
     // マウスエンターでmessage_container表示
     var mo_timeout = false;
     $('#contents').on('mouseenter', 'li.status', function(){
@@ -79,7 +82,5 @@ addGlobalStyle('\
             resize();
         }, 200);
     });
-    
-
-})(jQuery);
+});
 

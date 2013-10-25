@@ -4,6 +4,11 @@ http://userscripts.org/about/installing
 
 ## talknote_full_width.user.js
 
+* chrome は Tampermonkey で動作確認しています
+* talknote_full_width_for_chrome.user.js は拡張機能へのD&Dで直接インストール可能
+ * @require が使えないので別ファイルにしています
+* firefox では未検証
+
 ### 概要
 * talknote の画面は横幅固定であるが、横幅をウインドウサイズ最大になるようデザイン調整
 
