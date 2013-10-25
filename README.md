@@ -1,6 +1,7 @@
 userscripts
 ===========
-talknote が横浜固定なので横幅Fullに
+概要
+* talknote が横浜固定なので横幅Fullに
 
 変更点
 * 右ナビを左ナビの下に
