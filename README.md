@@ -6,7 +6,7 @@ http://userscripts.org/about/installing
 
 * chrome は Tampermonkey で動作確認しています
 * talknote_full_width_for_chrome.user.js は拡張機能へのD&Dで直接インストール可能
- * @require が使えないので別ファイルにしています
+ * この方法だと @require が使えないので別ファイルにしています
 * firefox では未検証
 
 ### 概要

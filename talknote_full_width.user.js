@@ -1,9 +1,9 @@
 // ==UserScript==
 // @name       talknote full width
 // @namespace  http://mediba.jp/~y-oe
-// @version    0.1
+// @version    0.2
 // @description  talknote が横幅固定なので横幅いっぱいに
-// @include    https://company.talknote.com/*/*
+// @match      https://company.talknote.com/*/*
 // @copyright  2013+, y-oe@mediba.jp
 // @require http://code.jquery.com/jquery-2.0.3.min.js
 // ==/UserScript==
@@ -22,6 +22,8 @@ function addGlobalStyle(css) {
 // message_container非表示
 // メニューの背景をCSSで定義
 addGlobalStyle('\
+.status {background-color:#f3f3f3;} \
+.status * {background-color:#fff;} \
 .tab_container .tab_content .message li.status p.message_text { font-size: 12px; } \
 .tab_container .tab_content .message li.status .message_container { display: none; } \
 #left_nav .left_menu li a         { background-image: none; background-color: #fff; border: 1px #ccc solid; border-radius: 5px; } \
@@ -30,27 +32,33 @@ addGlobalStyle('\
 #left_nav ul.left_menu li ul li a       { background-image: none; background-color: #fff; border: 1px #ccc solid; border-radius: 4px; } \
 #left_nav ul.left_menu li ul li a:hover { background-image: none; background-color: #4682b4; } \
 #left_nav ul.left_menu li ul li a.active { background-image: none; background-color: #4682b4; } \
+#left_nav ul.left_menu li ul li.keyword a, #left_nav ul.left_menu li ul li.newKeyword a { display: inline; padding: 3px 5px;} \
+.keyword button, .newKeyword button { color:#fff; background-color: #4F4F4D; border: 1px #4F4F4D solid; border-radius: 3px; cursor: pointer;} \
 ');
 
 (function ($) {
     // マウスエンターでmessage_container表示
     var mo_timeout = false;
-    $('#contents').on('mouseenter', 'li.status', function(){
+    $('#contents').on('mouseenter', 'li.status', function(event){
         var $status = $(this);
         mo_timeout = setTimeout(function() {
             $status.find('.message_container').slideDown('slow');
         }, 1000);
     });
-    $('#contents').on('mouseleave', 'li.status', function(){
+    $('#contents').on('mouseleave', 'li.status', function(event){
         if (mo_timeout !== false) {
             clearTimeout(mo_timeout);
-        	mo_timeout = false;
+            mo_timeout = false;
         }
         //$(this).find('.message_container').slideUp('slow');
     });
     // クリックでmessage_container表示On/Off
-    $('#contents').on('click', 'li.status', function(){
-        $(this).find('.message_container').toggle();
+    $('#contents').on('click', 'li.status:not(a)', function(event){
+        console.log('e:' + event.target.id);
+        console.log('s:' + $(this).attr('id'));
+        if (event.target.id === $(this).attr('id')) {
+            $(this).find('.message_container').toggle();
+        }
     });
 
     var resize = function() {
@@ -65,10 +73,10 @@ addGlobalStyle('\
     // 左ナビの横幅を拡大
     $('#left_nav').css({'width': '250px'});
     resize();
-    
+
     // 右ナビを左ナビ下に移動
     $('#right_nav').appendTo('#left_nav');
-    
+
     // 画面リサイズしたら再リサイズ
     var timer = false;
     $(window).resize(function() {
@@ -79,7 +87,47 @@ addGlobalStyle('\
             resize();
         }, 200);
     });
+
+    // 検索クエリを保存できるようにしてみた
+    var keywords = [];
+    if (localStorage.keywords) {
+        keywords = JSON.parse(localStorage.getItem('keywords'));
+    } else {
+        keywords = {'リリース':1, 'テスト':1};
+        localStorage.setItem('keywords', JSON.stringify(keywords));
+    }
+
+    $keywords = $('<ul>');
+    for (var keyword in keywords) {
+        var $keyword = $('<li id="keyword_' + keyword + '" class="keyword">').append('<a href="/mediba.jp/search/' + encodeURIComponent(keyword) + '/">' + keyword + '</a><button class="rmKeyword" data-keyword="' + keyword + '">－</button>');
+        $keywords.append($keyword);
+    };
+    $keywords.append($('<li class="newKeyword"><input type="text" id="newKeyword"><button id="addKeyword">＋</button></li>'));
+    $storedSearch = $('<ul>').append($('<li>').append('<a>検索</a>').append($keywords));
+    $('.left_menu').append($storedSearch);
+
+    // 追加ボタン
+    $('#addKeyword').on('click', function () {
+        var keyword = $('#newKeyword').val();
+        $('#newKeyword').val('');
+        keywords = JSON.parse(localStorage.getItem('keywords'));
+        keywords[keyword] = 1;
+        localStorage.setItem('keywords', JSON.stringify(keywords));
+
+        var $keyword = $('<li id="keyword_' + keyword + '" class="keyword">').append('<a href="/mediba.jp/search/' + encodeURIComponent(keyword) + '/">' + keyword + '</a><button class="rmKeyword" data-keyword="' + keyword + '">－</button>');
+        $(this).parent().before($keyword);
+        console.log(keyword + ' add');
+    });
+    // 削除ボタン
+    $('.left_menu').on('click', 'button.rmKeyword', function () {
+        var keyword = $(this).attr('data-keyword');
+        var keywords = JSON.parse(localStorage.getItem('keywords'));
+        delete keywords[keyword];
+        localStorage.setItem('keywords', JSON.stringify(keywords));
+
+        $(this).parent().remove();
+        console.log(keyword + ' remove');
+    });
     
 
 })(jQuery);
-

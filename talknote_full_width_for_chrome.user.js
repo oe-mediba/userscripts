@@ -38,7 +38,7 @@ loadAndExecute("//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js", fun
 
     // マウスエンターでmessage_container表示
     var mo_timeout = false;
-    $('#contents').on('mouseenter', 'li.status', function(){
+    $('#contents').on('mouseenter', 'li.status:not(a)', function(){
         var $status = $(this);
         mo_timeout = setTimeout(function() {
             $status.find('.message_container').slideDown('slow');
