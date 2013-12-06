@@ -5,7 +5,7 @@ http://userscripts.org/about/installing
 ## talknote_full_width.user.js
 
 * chrome は Tampermonkey で動作確認しています
-** 拡張機能へのD&Dで直接インストール可能
+ * 拡張機能へのD&Dで直接インストール可能
 * firefox では未検証
 
 ### 概要
