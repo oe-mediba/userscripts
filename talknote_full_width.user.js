@@ -36,7 +36,6 @@ addGlobalStyle('\
 #left_nav ul.left_menu li ul li.keyword a, #left_nav ul.left_menu li ul li.newKeyword a { display: inline; padding: 3px 5px;} \
 .keyword button, .newKeyword button { color:#fff; background-color: #4F4F4D; border: 1px #4F4F4D solid; border-radius: 3px; cursor: pointer;} \
 ');
-
 // jQuery使いたいけど chrome拡張機能へ D&D install する場合 require 使えないので
 // http://stackoverflow.com/questions/2246901/how-can-i-use-jquery-in-greasemonkey-scripts-in-google-chrome
 var load, execute, loadAndExecute;
@@ -53,10 +52,9 @@ load = function(a, b, c) {
         return execute(b)
     })
 };
-
 loadAndExecute("//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js", function() {
 
-    // マウスエンターでmessage_container表示
+// マウスエンターでmessage_container表示
     var mo_timeout = false;
     $('#contents').on('mouseenter', 'li.status', function(event) {
         var $status = $(this);
@@ -69,7 +67,7 @@ loadAndExecute("//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js", fun
             clearTimeout(mo_timeout);
             mo_timeout = false;
         }
-        //$(this).find('.message_container').slideUp('slow');
+//$(this).find('.message_container').slideUp('slow');
     });
     // クリックでmessage_container表示On/Off
     $('#contents').on('click', 'li.status:not(a)', function(event) {
@@ -79,7 +77,6 @@ loadAndExecute("//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js", fun
             $(this).find('.message_container').toggle();
         }
     });
-
     var resize = function() {
         width = $(window).width();
         // 全体の横幅を100%に
@@ -88,14 +85,18 @@ loadAndExecute("//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js", fun
         $('#container').css({'width': (width - 250 - 20) + 'px'});
         // コンテンツの横幅を(全体-左ナビ-マージン)に
         $('#contents').css({'width': (width - 250 - 20 - 30) + 'px'});
+        $(".feed_comment").on('change', function() {
+            $(this).css("width", (width - 250 - 20 - 30 - 180) + 'px');
+        });
+        $(".feed_comment").on('focusin', function() {
+            $(this).css("width", (width - 250 - 20 - 30 - 180) + 'px');
+        });
     };
     // 左ナビの横幅を拡大
     $('#left_nav').css({'width': '250px'});
     resize();
-
     // 右ナビを左ナビ下に移動
     $('#right_nav').appendTo('#left_nav');
-
     // 画面リサイズしたら再リサイズ
     var timer = false;
     $(window).resize(function() {
@@ -106,7 +107,6 @@ loadAndExecute("//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js", fun
             resize();
         }, 200);
     });
-
     // 検索保存
     var keywords = [];
     if (localStorage.keywords) {
@@ -125,14 +125,12 @@ loadAndExecute("//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js", fun
     $keywords.append($('<li class="newKeyword"><input type="text" id="newKeyword"><button id="addKeyword">＋</button></li>'));
     $storedSearch = $('<ul>').append($('<li>').append('<a>検索</a>').append($keywords));
     $('.left_menu').append($storedSearch);
-
     $('#addKeyword').on('click', function() {
         var keyword = $('#newKeyword').val();
         $('#newKeyword').val('');
         keywords = JSON.parse(localStorage.getItem('keywords'));
         keywords[keyword] = 1;
         localStorage.setItem('keywords', JSON.stringify(keywords));
-
         var $keyword = $('<li id="keyword_' + keyword + '" class="keyword">').append('<a href="/mediba.jp/search/' + encodeURIComponent(keyword) + '/">' + keyword + '</a><button class="rmKeyword" data-keyword="' + keyword + '">－</button>');
         $(this).parent().before($keyword);
         console.log(keyword + ' add');
@@ -142,26 +140,23 @@ loadAndExecute("//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js", fun
         var keywords = JSON.parse(localStorage.getItem('keywords'));
         delete keywords[keyword];
         localStorage.setItem('keywords', JSON.stringify(keywords));
-
         $(this).parent().remove();
         console.log(keyword + ' remove');
     });
 
     // 通知
-    var prelink = '';
-    $('#news_feed li').trigger('click');
-    setInterval(function() {
+    var prevlink = '';
+    var notify = function() {
         var $first_new = $('#new_at_header a:first');
         var link = $first_new.attr('href');
-        if (prelink && prelink != link) {
-            var icon = $first_new.find('img').attr('src');
-            var body = $first_new.find('.message').text().trim() + "\n" + $first_new.find('.time').text().trim();
-            console.log(link, icon, body);
-            notify(icon, body, link);
-            prelink = link;
+        if (prevlink === '' || prevlink == link) {
+            return;
         }
-    }, 1000 * 60 * 5); // 5min
-    function notify(icon, body, link) {
+        var icon = $first_new.find('img').attr('src');
+        var body = $first_new.find('.message').text().trim() + "\n" + $first_new.find('.time').text().trim();
+        console.debug(link, icon, body);
+        prevlink = link;
+
         var havePermission = window.webkitNotifications.checkPermission();
         if (havePermission == 0) {
             // 0 is PERMISSION_ALLOWED
@@ -169,15 +164,24 @@ loadAndExecute("//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js", fun
                     icon,
                     "Talknote",
                     body
-                    );
+            );
             notification.onclick = function() {
                 window.focus();
                 this.cancel();
-            }
+        		$('#news_topic').show();
+            };
             notification.show();
         } else {
             window.webkitNotifications.requestPermission();
         }
-    }
+    };
+    setInterval(function() {
+        if (!$('#new_at_header').text().trim()) {
+            $('#news_feed li').trigger('click'); // 一度開かないと new_at_header が取得されないため
+            setTimeout(notify, 200);
+        } else {
+            notify();
+        }
+    }, 1000 * 60 * 5); // 5min
 
 });
