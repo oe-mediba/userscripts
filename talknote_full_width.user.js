@@ -73,6 +73,8 @@ loadAndExecute("//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js", fun
         $('#container').css({'width': (width - 250 - 20)+ 'px'});
         // コンテンツの横幅を(全体-左ナビ-マージン)に
         $('#contents').css({'width': (width - 250 - 20 - 30)+ 'px'});
+        
+        $('#message_text').css({'width':(width - 250 - 20 - 30)+ 'px'});
     };
     // 左ナビの横幅を拡大
     $('#left_nav').css({'width': '250px'});
