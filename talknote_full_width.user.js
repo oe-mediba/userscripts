@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name       talknote full width
-// @namespace  http://mediba.jp/~y-oe
+// @namespace  http://github.com/oe-mediba/userscripts/
 // @version    0.3
 // @description  talknote が横幅固定なので横幅いっぱいに
 // @match      https://company.talknote.com/*/*
@@ -85,10 +85,10 @@ loadAndExecute("//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js", fun
         $('#container').css({'width': (width - 250 - 20) + 'px'});
         // コンテンツの横幅を(全体-左ナビ-マージン)に
         $('#contents').css({'width': (width - 250 - 20 - 30) + 'px'});
-        $(".feed_comment").on('change', function() {
+        $("#contents .feed_comment").on('change', function() {
             $(this).css("width", (width - 250 - 20 - 30 - 180) + 'px');
         });
-        $(".feed_comment").on('focusin', function() {
+        $("#contents .feed_comment").on('focusin', function() {
             $(this).css("width", (width - 250 - 20 - 30 - 180) + 'px');
         });
     };
@@ -145,19 +145,31 @@ loadAndExecute("//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js", fun
     });
 
     // 通知
-    var prevlink = '';
+    var havePermission = window.webkitNotifications.checkPermission();
+    if (havePermission != 0) {
+        $notifyOnBtn = $('<li><a>通知ON</a></li>').on('click', function() {
+            window.webkitNotifications.requestPermission();
+            $(this).remove();
+        });
+        $('#header_cont_right ul').append($notifyOnBtn);
+    }
+    var prevtime = '';
     var notify = function() {
         var $first_new = $('#new_at_header a:first');
-        var link = $first_new.attr('href');
-        if (prevlink === '' || prevlink == link) {
+        var time = $first_new.find('abbr').attr('title');
+        console.debug(prevtime, time);
+        if (prevtime === '' || prevtime == time) {
+            prevtime = time;
+            $('#news_topic').hide();
             return;
         }
         var icon = $first_new.find('img').attr('src');
         var body = $first_new.find('.message').text().trim() + "\n" + $first_new.find('.time').text().trim();
-        console.debug(link, icon, body);
-        prevlink = link;
+        console.debug(time, icon, body);
+        prevtime = time;
 
         var havePermission = window.webkitNotifications.checkPermission();
+        console.debug(havePermission);
         if (havePermission == 0) {
             // 0 is PERMISSION_ALLOWED
             var notification = window.webkitNotifications.createNotification(
@@ -171,17 +183,15 @@ loadAndExecute("//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js", fun
         		$('#news_topic').show();
             };
             notification.show();
-        } else {
-            window.webkitNotifications.requestPermission();
         }
     };
     setInterval(function() {
-        if (!$('#new_at_header').text().trim()) {
+        //if (!$('#new_at_header').text().trim()) {
             $('#news_feed li').trigger('click'); // 一度開かないと new_at_header が取得されないため
             setTimeout(notify, 200);
-        } else {
-            notify();
-        }
+        //} else {
+        //    notify();
+        //}
     }, 1000 * 60 * 5); // 5min
 
 });
