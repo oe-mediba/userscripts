@@ -85,11 +85,14 @@ loadAndExecute("//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js", fun
         $('#container').css({'width': (width - 250 - 20) + 'px'});
         // コンテンツの横幅を(全体-左ナビ-マージン)に
         $('#contents').css({'width': (width - 250 - 20 - 30) + 'px'});
+        // タブ横幅調整
+        $('#share .tab_list').css({'width': (width - 250 - 20 - 30) + 'px'});
+        // 各投稿のコメント欄をワイルドに
         $("#contents").on('keyup focusin', function() {
             $(this).css("width", (width - 250 - 20 - 30 - 180) + 'px');
         });
         // コメント入力欄の横幅をワイルドに
-        $('#message_text').css({'width':(width - 250 - 20 - 30)+ 'px'});
+        $('#message_text').css({'width': (width - 250 - 20 - 30) + 'px'});
     };
     // 左ナビの横幅を拡大
     $('#left_nav').css({'width': '250px'});
@@ -120,7 +123,7 @@ loadAndExecute("//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js", fun
         var $keyword = $('<li id="keyword_' + keyword + '" class="keyword">').append('<a href="/mediba.jp/search/' + encodeURIComponent(keyword) + '/">' + keyword + '</a><button class="rmKeyword" data-keyword="' + keyword + '">－</button>');
         $keywords.append($keyword);
     }
-    ;
+
     $keywords.append($('<li class="newKeyword"><input type="text" id="newKeyword"><button id="addKeyword">＋</button></li>'));
     $storedSearch = $('<ul>').append($('<li>').append('<a>検索</a>').append($keywords));
     $('.left_menu').append($storedSearch);
@@ -156,10 +159,12 @@ loadAndExecute("//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js", fun
     var notify = function() {
         var $first_new = $('#new_at_header a:first');
         var time = $first_new.find('abbr').attr('title');
+
+        $('#news_topic').hide(); // new_at_header 閉じる
+
         console.debug(prevtime, time);
         if (prevtime === '' || prevtime == time) {
             prevtime = time;
-            $('#news_topic').hide();
             return;
         }
         var icon = $first_new.find('img').attr('src');
@@ -175,19 +180,19 @@ loadAndExecute("//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js", fun
                     icon,
                     "Talknote",
                     body
-            );
+                    );
             notification.onclick = function() {
                 window.focus();
                 this.cancel();
-        		$('#news_topic').show();
+                $('#news_topic').show();
             };
             notification.show();
         }
     };
     setInterval(function() {
         //if (!$('#new_at_header').text().trim()) {
-            $('#news_feed li').trigger('click'); // 一度開かないと new_at_header が取得されないため
-            setTimeout(notify, 200);
+        $('#news_feed li').trigger('click'); // 一度開かないと new_at_header が取得されないため
+        setTimeout(notify, 200);
         //} else {
         //    notify();
         //}
