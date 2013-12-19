@@ -80,8 +80,8 @@ loadAndExecute("//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js", fun
     });
     // クリックでmessage_container表示On/Off
     $('#contents').on('click', 'li.status:not(a)', function(event) {
-        console.log('e:' + event.target.id);
-        console.log('s:' + $(this).attr('id'));
+        //console.log('e:' + event.target.id);
+        //console.log('s:' + $(this).attr('id'));
         if (event.target.id === $(this).attr('id')) {
             $(this).find('.message_container').toggle();
         }
@@ -100,7 +100,7 @@ loadAndExecute("//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js", fun
         // タブ横幅調整
         $('#share .tab_list').css({'width': (width - 250 - 20 - 30) + 'px'});
         // 各投稿のコメント欄をワイルドに
-        $("#contents").on('keyup focusin', function() {
+        $("#contents").on('focusout', '.feed_comment', function() {
             $(this).css("width", (width - 250 - 20 - 30 - 180) + 'px');
         });
         // コメント入力欄の横幅をワイルドに
