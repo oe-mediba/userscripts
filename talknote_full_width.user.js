@@ -202,7 +202,7 @@ loadAndExecute("//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js", fun
             notify(icon, body, link);
             //notify(icon, body);
         });
-        ('#news_topic').hide(); // お知らせ閉じる
+        $('#news_topic').hide(); // お知らせ閉じる
     };
     // chrome通知
     var notify = function(icon, body, link) {
