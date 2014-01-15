@@ -9,7 +9,6 @@
 // ==/UserScript==
 
 (function ($) {
-
     // パスワード登録
     if (location.href == 'http://192.168.1.58/XGweb/login.asp') {
         document.forms.item(0).LoginID.value = 'foo'; // ユーザID
@@ -24,6 +23,11 @@
         PassWordRegister(document.frmLOGIN);
     }
 
+    // 出勤か退勤が押されたら戻る
+    if (location.href == 'http://192.168.1.58/XGweb/page/XgwTopMenu.asp#') {
+        history.back();
+    }
+
     /* 状態を保持してなんとかかんとかやれたらいいな (つまりやらない) */
     // 出勤
     // if (location.href == 'http://192.168.1.58/XGweb/frame.asp') {
@@ -33,4 +37,7 @@
     // if (location.href == 'http://192.168.1.58/XGweb/frame.asp') {
     //     frameBtm.PanchWindowOpen(1);
     // }
+    // ログアウト
+    // frameTop.Logout(document.form);
+
 })(jQuery);
